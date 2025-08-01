@@ -3,9 +3,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Pages
 import LandingPage from "./pages/Landing";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/dashboard";
 import Auth from "./pages/Auth";
-import RedirectLink from "./pages/redirect-link"; // ✅ Fixed import to match file name
+import RedirectLink from "./pages/redirect-link"; //  Fixed import to match file name
 import ErrorPage from "./pages/ErrorPage";
 
 // Layout & Components
