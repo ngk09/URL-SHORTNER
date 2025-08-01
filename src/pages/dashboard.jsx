@@ -31,7 +31,8 @@ export default function Dashboard() {
   const [urls, setUrls] = useState([]);
   const [clicks, setClicks] = useState([]);
 
-  const HOST_URL = "https://trimmr.vercel.app"; // Replace after deploy
+  const HOST_URL = "https://aquamarine-travesseiro-5a02c0.netlify.app";
+  // Replace after deploy
 
   // Fetch URLs
   const fetchUrls = async () => {
