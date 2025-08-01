@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Login from "../components/login"; // ✅ Use default export with capital first letter
-import Signup from "../components/signup";
+import Login from "../components/Login"; // ✅ Use default export with capital first letter
+import Signup from "../components/Signup";
 
 const Auth = () => {
   const [activeComponent, setActiveComponent] = useState(null);
