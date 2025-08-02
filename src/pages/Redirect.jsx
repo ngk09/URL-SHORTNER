@@ -20,41 +20,43 @@ export default function Redirect() {
           return;
         }
 
-        // 2️⃣ Get location (using ipinfo for better reliability)
+        // 2️⃣ Get location (non-blocking)
         let city = "Unknown";
         let country = "Unknown";
-        try {
-          const res = await fetch("https://ipinfo.io/json?token=YOUR_TOKEN"); // replace YOUR_TOKEN
-          if (res.ok) {
-            const geo = await res.json();
-            city = geo.city || "Unknown";
-            country = geo.country || "Unknown";
+
+        const fetchLocation = async () => {
+          try {
+            const res = await fetch(
+              "https://ipinfo.io/json?token=YOUR_IPINFO_TOKEN"
+            ); // ✅ Replace with your free ipinfo token
+            if (res.ok) {
+              const geo = await res.json();
+              city = geo.city || "Unknown";
+              country = geo.country || "Unknown";
+            }
+          } catch {
+            console.log("⚠️ Location fetch failed, continuing redirect...");
           }
-        } catch (err) {
-          console.log("Location fetch failed:", err);
-        }
+        };
 
-        // 3️⃣ Log click in Supabase
-        const { error: clickError } = await supabase.from("clicks").insert([
-          {
-            url_id: urlData.id,
-            device: navigator.userAgent,
-            city,
-            country,
-          },
-        ]);
+        // Fetch location but don't wait to redirect
+        fetchLocation().then(async () => {
+          await supabase.from("clicks").insert([
+            {
+              url_id: urlData.id,
+              device: navigator.userAgent,
+              city,
+              country,
+            },
+          ]);
 
-        if (clickError) console.error("Error logging click:", clickError);
+          await supabase
+            .from("urls")
+            .update({ total_clicks: (urlData.total_clicks || 0) + 1 })
+            .eq("id", urlData.id);
+        });
 
-        // 4️⃣ Increment total clicks
-        const { error: updateError } = await supabase
-          .from("urls")
-          .update({ total_clicks: (urlData.total_clicks || 0) + 1 })
-          .eq("id", urlData.id);
-
-        if (updateError) console.error("Error updating clicks:", updateError);
-
-        // 5️⃣ Redirect to original URL
+        // 3️⃣ Immediate redirect
         window.location.href = urlData.original_url;
       } catch (err) {
         console.error("Unexpected error:", err);
