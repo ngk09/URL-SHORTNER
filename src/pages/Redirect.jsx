@@ -3,10 +3,12 @@ import { useParams } from "react-router-dom";
 import supabase from "../db/supabase";
 
 export default function Redirect() {
-  const { id: code } = useParams(); // ✅ Fixed param name
+  const { code } = useParams(); // ✅ Must match ":code" in App.jsx
 
   useEffect(() => {
     const handleRedirect = async () => {
+      if (!code) return; // prevent undefined query
+
       try {
         // 1️⃣ Fetch original URL
         const { data: urlData, error: urlError } = await supabase
@@ -20,23 +22,25 @@ export default function Redirect() {
           return;
         }
 
-        // 2️⃣ Immediate redirect
+        // 2️⃣ Immediate redirect to the original URL
         window.location.href = urlData.original_url;
 
-        // 3️⃣ Log analytics in background
+        // 3️⃣ Background analytics logging
         let city = "Unknown";
         let country = "Unknown";
 
         try {
           const res = await fetch(
-            "https://ipinfo.io/json?token=YOUR_REAL_TOKEN" // ✅ Replace
+            "https://ipinfo.io/json?token=YOUR_REAL_TOKEN" // 🔹 replace with actual token
           );
           if (res.ok) {
             const geo = await res.json();
             city = geo.city || "Unknown";
             country = geo.country || "Unknown";
           }
-        } catch {}
+        } catch {
+          console.warn("Geo lookup failed");
+        }
 
         await supabase.from("clicks").insert([
           {
