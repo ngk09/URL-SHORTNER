@@ -2,8 +2,8 @@ import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Pages
-import LandingPage from "./pages/Landing";
-import Dashboard from "./pages/dashboard";
+import LandingPage from "./pages/LandingPage";
+import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import RedirectLink from "./pages/RedirectLink"; //  Fixed import to match file name
 import ErrorPage from "./pages/ErrorPage";
