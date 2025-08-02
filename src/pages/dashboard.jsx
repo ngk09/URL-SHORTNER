@@ -31,8 +31,8 @@ export default function Dashboard() {
   const [urls, setUrls] = useState([]);
   const [clicks, setClicks] = useState([]);
 
-  const HOST_URL = "https://aquamarine-travesseiro-5a02c0.netlify.app";
-  // Replace after deploy
+  // ✅ Auto-detect domain for short URLs
+  const HOST_URL = window.location.origin;
 
   // Fetch URLs
   const fetchUrls = async () => {
