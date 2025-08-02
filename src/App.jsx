@@ -5,20 +5,24 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
-import RedirectLink from "./pages/RedirectLink";
+import Redirect from "./pages/Redirect" //  Fixed import to match file name
 import ErrorPage from "./pages/ErrorPage";
 
 // Layout & Components
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// ✅ Router Setup
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <AppLayout />,
-    errorElement: <ErrorPage />,
+    path: "/",                   // Base path
+    element: <AppLayout />,       // Main layout
+    errorElement: <ErrorPage />,  // Handles route errors or 404
     children: [
-      { index: true, element: <LandingPage /> },
+      {
+        index: true,              // Default child for "/"
+        element: <LandingPage />,
+      },
       {
         path: "dashboard",
         element: (
@@ -27,13 +31,24 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: "auth", element: <Auth /> },
-      { path: ":id", element: <RedirectLink /> },
-      { path: "*", element: <ErrorPage /> },
+      {
+        path: "auth",
+        element: <Auth />,
+      },
+      {
+        path: ":id",               // Handles short URL redirection
+        element: <Redirect />,
+      },
+      {
+        path: "*",
+        element: <ErrorPage />,    // Catch-all 404
+      },
     ],
   },
 ]);
 
-export default function App() {
+function App() {
   return <RouterProvider router={router} />;
 }
+
+export default App;

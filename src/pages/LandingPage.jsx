@@ -3,15 +3,29 @@ import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {
   const [activeIndex, setActiveIndex] = useState(null);
+  const [showMessage, setShowMessage] = useState("");
+  const [urlInput, setUrlInput] = useState("");
   const navigate = useNavigate();
 
   const toggleAccordion = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
+  const showPopup = (message) => {
+    setShowMessage(message);
+    setTimeout(() => setShowMessage(""), 1500);
+  };
+
   const handleShorten = (e) => {
     e.preventDefault();
-    navigate("/auth"); // Redirect to login/signup page
+
+    if (!urlInput.trim()) {
+      showPopup("⚠️ Please enter a URL!");
+      return;
+    }
+
+    showPopup("🔐 Please login first!");
+    setTimeout(() => navigate("/auth"), 1500);
   };
 
   return (
@@ -35,7 +49,7 @@ export default function LandingPage() {
             color: white;
             font-family: "Poppins", "Segoe UI", Arial, sans-serif;
             line-height: 1.2;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.4);
+            text-shadow: 0 0 15px #00f7ff, 0 0 30px #00f7ff;
             margin-bottom: 40px;
           }
 
@@ -128,6 +142,30 @@ export default function LandingPage() {
             color: #333;
             background: #fff;
           }
+
+          /* Neon Popup */
+          .popup-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffcc00;
+            color: #001f4d;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            box-shadow: 0 0 15px #ffcc00, 0 0 30px #ffcc00;
+            z-index: 1000;
+            animation: fadeInOut 1.5s ease forwards;
+          }
+
+          @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -30px); }
+            20% { opacity: 1; transform: translate(-50%, 0); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -30px); }
+          }
         `}
       </style>
 
@@ -143,6 +181,8 @@ export default function LandingPage() {
             type="text"
             className="url-input"
             placeholder="Enter your long URL here..."
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
           />
           <button type="submit" className="url-submit">Shorten</button>
         </form>
@@ -176,6 +216,9 @@ export default function LandingPage() {
           ))}
         </div>
       </div>
+
+      {/* Neon Popup */}
+      {showMessage && <div className="popup-message">{showMessage}</div>}
     </>
   );
 }

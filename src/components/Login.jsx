@@ -21,7 +21,7 @@ export default function Login() {
       setMessage(`❌ ${error.message}`);
     } else if (data?.user) {
       setMessage(`✅ Login Successful! Redirecting...`);
-      navigate("/dashboard"); // 🚀 Instant redirect to Dashboard
+      setTimeout(() => navigate("/dashboard"), 1500);
     } else {
       setMessage("❌ Login failed. Please try again.");
     }
@@ -34,20 +34,29 @@ export default function Login() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(135deg, #6e8efb, #a777e3)",
+        background: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)",
+        fontFamily: "Arial, sans-serif",
       }}
     >
       <div
         style={{
-          background: "white",
+          background: "rgba(20, 20, 40, 0.9)",
           padding: "40px",
           borderRadius: "20px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+          boxShadow: "0 0 25px #6e8efb, 0 0 50px #a777e3",
           width: "350px",
           textAlign: "center",
         }}
       >
-        <h2 style={{ marginBottom: "20px", color: "#333" }}>Login</h2>
+        <h2
+          style={{
+            marginBottom: "20px",
+            color: "#fff",
+            textShadow: "0 0 10px #6e8efb, 0 0 20px #a777e3",
+          }}
+        >
+          Neon Login
+        </h2>
 
         <form onSubmit={handleLogin}>
           <input
@@ -58,10 +67,14 @@ export default function Login() {
             required
             style={{
               width: "100%",
-              padding: "10px",
+              padding: "12px",
               margin: "10px 0",
               borderRadius: "10px",
-              border: "1px solid #ccc",
+              border: "2px solid #6e8efb",
+              background: "transparent",
+              color: "white",
+              outline: "none",
+              boxShadow: "0 0 10px #6e8efb",
             }}
           />
           <input
@@ -72,31 +85,56 @@ export default function Login() {
             required
             style={{
               width: "100%",
-              padding: "10px",
+              padding: "12px",
               margin: "10px 0",
               borderRadius: "10px",
-              border: "1px solid #ccc",
+              border: "2px solid #a777e3",
+              background: "transparent",
+              color: "white",
+              outline: "none",
+              boxShadow: "0 0 10px #a777e3",
             }}
           />
           <button
             type="submit"
             style={{
               width: "100%",
-              padding: "10px",
+              padding: "12px",
               marginTop: "15px",
-              background: "#6e8efb",
+              background: "linear-gradient(90deg, #6e8efb, #a777e3)",
               color: "white",
               border: "none",
               borderRadius: "10px",
               fontWeight: "bold",
               cursor: "pointer",
+              boxShadow: "0 0 20px #6e8efb, 0 0 40px #a777e3",
+              transition: "0.3s",
             }}
+            onMouseOver={(e) =>
+              (e.target.style.boxShadow =
+                "0 0 30px #6e8efb, 0 0 60px #a777e3")
+            }
+            onMouseOut={(e) =>
+              (e.target.style.boxShadow =
+                "0 0 20px #6e8efb, 0 0 40px #a777e3")
+            }
           >
             Login
           </button>
         </form>
 
-        {message && <p style={{ marginTop: "10px" }}>{message}</p>}
+        {message && (
+          <p
+            style={{
+              marginTop: "15px",
+              fontWeight: "bold",
+              color: "#fff",
+              textShadow: "0 0 10px #6e8efb, 0 0 20px #a777e3",
+            }}
+          >
+            {message}
+          </p>
+        )}
       </div>
     </div>
   );

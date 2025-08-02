@@ -4,7 +4,6 @@ import supabase from "../db/supabase";
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [profilePic, setProfilePic] = useState(null);
   const [message, setMessage] = useState("");
 
   const handleSignup = async (e) => {
@@ -13,42 +12,12 @@ export default function Signup() {
 
     try {
       // 1️⃣ Create user in Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
-      if (authError) throw authError;
-
-      const userId = authData.user.id;
-      let profilePicUrl = null;
-
-      // 2️⃣ If profile pic uploaded, store in Supabase Storage
-      if (profilePic) {
-        const { data: storageData, error: storageError } = await supabase.storage
-          .from("avatars") // bucket name
-          .upload(`${userId}/${profilePic.name}`, profilePic);
-
-        if (storageError) throw storageError;
-
-        // Get public URL
-        const { data: publicUrlData } = supabase.storage
-          .from("avatars")
-          .getPublicUrl(`${userId}/${profilePic.name}`);
-
-        profilePicUrl = publicUrlData.publicUrl;
-      }
-
-      // 3️⃣ Store user profile in "profiles" table
-      const { error: dbError } = await supabase.from("profiles").insert([
-        {
-          id: userId,
-          email,
-          profile_pic: profilePicUrl,
-        },
-      ]);
-
-      if (dbError) throw dbError;
+      if (error) throw error;
 
       setMessage("✅ Signup successful! Check your email for verification.");
     } catch (err) {
@@ -63,35 +32,48 @@ export default function Signup() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(135deg, #ff9a9e, #fad0c4)",
+        background: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)",
+        fontFamily: "Arial, sans-serif",
       }}
     >
       <form
         onSubmit={handleSignup}
         style={{
-          background: "white",
+          background: "rgba(20, 20, 40, 0.9)",
           padding: "40px",
           borderRadius: "20px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+          boxShadow: "0 0 25px #ff758c, 0 0 50px #ff7eb3",
           width: "350px",
           textAlign: "center",
         }}
       >
-        <h2>Sign Up</h2>
+        <h2
+          style={{
+            color: "#fff",
+            marginBottom: "20px",
+            textShadow: "0 0 10px #ff758c, 0 0 20px #ff7eb3",
+          }}
+        >
+          Neon Signup
+        </h2>
 
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
           style={{
             width: "100%",
-            padding: "10px",
+            padding: "12px",
             margin: "10px 0",
             borderRadius: "10px",
-            border: "1px solid #ccc",
+            border: "2px solid #ff7eb3",
+            background: "transparent",
+            color: "white",
+            outline: "none",
+            boxShadow: "0 0 10px #ff7eb3",
           }}
-          required
         />
 
         <input
@@ -99,23 +81,17 @@ export default function Signup() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
           style={{
             width: "100%",
-            padding: "10px",
+            padding: "12px",
             margin: "10px 0",
             borderRadius: "10px",
-            border: "1px solid #ccc",
-          }}
-          required
-        />
-
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setProfilePic(e.target.files[0])}
-          style={{
-            width: "100%",
-            margin: "10px 0",
+            border: "2px solid #ff758c",
+            background: "transparent",
+            color: "white",
+            outline: "none",
+            boxShadow: "0 0 10px #ff758c",
           }}
         />
 
@@ -123,21 +99,41 @@ export default function Signup() {
           type="submit"
           style={{
             width: "100%",
-            padding: "10px",
+            padding: "12px",
             marginTop: "15px",
-            background: "#ff758c",
+            background: "linear-gradient(90deg, #ff758c, #ff7eb3)",
             color: "white",
             border: "none",
             borderRadius: "10px",
             fontWeight: "bold",
             cursor: "pointer",
+            boxShadow: "0 0 20px #ff758c, 0 0 40px #ff7eb3",
             transition: "0.3s",
           }}
+          onMouseOver={(e) =>
+            (e.target.style.boxShadow =
+              "0 0 30px #ff758c, 0 0 60px #ff7eb3")
+          }
+          onMouseOut={(e) =>
+            (e.target.style.boxShadow =
+              "0 0 20px #ff758c, 0 0 40px #ff7eb3")
+          }
         >
           Sign Up
         </button>
 
-        {message && <p style={{ marginTop: "10px" }}>{message}</p>}
+        {message && (
+          <p
+            style={{
+              marginTop: "15px",
+              fontWeight: "bold",
+              color: "#fff",
+              textShadow: "0 0 10px #ff758c, 0 0 20px #ff7eb3",
+            }}
+          >
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );

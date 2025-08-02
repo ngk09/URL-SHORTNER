@@ -1,28 +1,27 @@
-// src/pages/Dashboard.jsx
 import React, { useState, useEffect } from "react";
 import supabase from "../db/supabase";
 import useAuth from "../hooks/useAuth";
 import QRCode from "qrcode";
-import { Bar, Pie } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
-  ArcElement,
 } from "chart.js";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
-  Legend,
-  ArcElement
+  Legend
 );
 
 export default function Dashboard() {
@@ -31,7 +30,6 @@ export default function Dashboard() {
   const [urls, setUrls] = useState([]);
   const [clicks, setClicks] = useState([]);
 
-  // ✅ Auto-detect domain for short URLs
   const HOST_URL = window.location.origin;
 
   // Fetch URLs
@@ -47,18 +45,21 @@ export default function Dashboard() {
 
   // Fetch Clicks
   const fetchClicks = async () => {
-    if (!user) return;
+    if (!user || urls.length === 0) return;
     const { data } = await supabase
       .from("clicks")
-      .select("*, urls!inner(user_id,short_url)")
-      .eq("urls.user_id", user.id);
+      .select("url_id")
+      .in("url_id", urls.map((u) => u.id));
     setClicks(data || []);
   };
 
   useEffect(() => {
     fetchUrls();
-    fetchClicks();
   }, [user]);
+
+  useEffect(() => {
+    fetchClicks();
+  }, [urls]);
 
   // Shorten URL
   const handleSubmit = async (e) => {
@@ -87,12 +88,12 @@ export default function Dashboard() {
 
   // Delete URL
   const handleDelete = async (id) => {
-    await supabase.from("urls").delete().eq("id", id);
+    const { error } = await supabase.from("urls").delete().eq("id", id);
+    if (error) console.error("Delete failed:", error);
     fetchUrls();
     fetchClicks();
   };
 
-  // Download QR
   const downloadQR = (qr, code) => {
     const link = document.createElement("a");
     link.href = qr;
@@ -100,47 +101,89 @@ export default function Dashboard() {
     link.click();
   };
 
-  // 🔹 Analytics Data
-  const deviceCounts = clicks.reduce(
-    (acc, c) => {
-      const device = /Mobi|Android/i.test(c.device) ? "Mobile" : "Desktop";
-      acc[device] += 1;
-      return acc;
-    },
-    { Desktop: 0, Mobile: 0 }
-  );
-
-  const urlClickCounts = urls.map(
-    (u) => clicks.filter((c) => c.url_id === u.id).length
-  );
-
-  const locationCounts = clicks.reduce((acc, c) => {
-    const loc = `${c.city || "Unknown"}, ${c.country || ""}`;
-    acc[loc] = (acc[loc] || 0) + 1;
-    return acc;
-  }, {});
+  // Line Chart: Total Clicks per URL
+  const lineChartData = {
+    labels: urls.map((u) => u.short_url),
+    datasets: [
+      {
+        label: "Total Clicks Per URL",
+        data: urls.map((u) => clicks.filter((c) => c.url_id === u.id).length),
+        borderColor: "#00f7ff",
+        backgroundColor: "rgba(0, 247, 255, 0.2)",
+        fill: true,
+        tension: 0.3,
+      },
+    ],
+  };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1>My Dashboard</h1>
+    <div
+      style={{
+        padding: "30px",
+        background: "#0a0a0a",
+        color: "white",
+        minHeight: "100vh",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h1 style={{ textAlign: "center", color: "#00f7ff", textShadow: "0 0 20px #00f7ff" }}>
+        ⚡ My Neon Dashboard ⚡
+      </h1>
 
       {/* Shorten Form */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          justifyContent: "center",
+          gap: "10px",
+        }}
+      >
         <input
           type="url"
           placeholder="Enter URL..."
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
-          style={{ padding: "10px", width: "300px", marginRight: "10px" }}
+          style={{
+            padding: "10px",
+            width: "300px",
+            border: "2px solid #00f7ff",
+            background: "#111",
+            color: "white",
+            outline: "none",
+            boxShadow: "0 0 10px #00f7ff",
+          }}
         />
-        <button type="submit">Shorten</button>
+        <button
+          type="submit"
+          style={{
+            padding: "10px 20px",
+            background: "#00f7ff",
+            color: "#000",
+            fontWeight: "bold",
+            border: "none",
+            boxShadow: "0 0 20px #00f7ff",
+            cursor: "pointer",
+          }}
+        >
+          Shorten
+        </button>
       </form>
 
       {/* URLs Table */}
-      <table border="1" cellPadding="10">
+      <table
+        style={{
+          background: "#111",
+          color: "white",
+          width: "100%",
+          borderCollapse: "collapse",
+          boxShadow: "0 0 20px #00f7ff",
+        }}
+      >
         <thead>
-          <tr>
+          <tr style={{ background: "#00f7ff", color: "#000" }}>
             <th>Short URL</th>
             <th>QR Code</th>
             <th>Total Clicks</th>
@@ -149,12 +192,13 @@ export default function Dashboard() {
         </thead>
         <tbody>
           {urls.map((item) => (
-            <tr key={item.id}>
+            <tr key={item.id} style={{ textAlign: "center" }}>
               <td>
                 <a
                   href={`${HOST_URL}/${item.short_url}`}
                   target="_blank"
                   rel="noreferrer"
+                  style={{ color: "#00f7ff", textShadow: "0 0 10px #00f7ff" }}
                 >
                   {HOST_URL}/{item.short_url}
                 </a>
@@ -162,14 +206,32 @@ export default function Dashboard() {
               <td>
                 <img src={item.qr} alt="QR" width="80" />
               </td>
-              <td>{item.total_clicks}</td>
+              <td>{clicks.filter((c) => c.url_id === item.id).length}</td>
               <td>
-                <button onClick={() => downloadQR(item.qr, item.short_url)}>
+                <button
+                  onClick={() => downloadQR(item.qr, item.short_url)}
+                  style={{
+                    marginRight: "10px",
+                    padding: "5px 10px",
+                    background: "#00f7ff",
+                    color: "#000",
+                    border: "none",
+                    boxShadow: "0 0 10px #00f7ff",
+                    cursor: "pointer",
+                  }}
+                >
                   Download QR
                 </button>
                 <button
                   onClick={() => handleDelete(item.id)}
-                  style={{ marginLeft: "10px", color: "red" }}
+                  style={{
+                    padding: "5px 10px",
+                    background: "#ff005c",
+                    color: "white",
+                    border: "none",
+                    boxShadow: "0 0 10px #ff005c",
+                    cursor: "pointer",
+                  }}
                 >
                   Delete
                 </button>
@@ -179,66 +241,28 @@ export default function Dashboard() {
         </tbody>
       </table>
 
-      {/* Analytics Section */}
-      <h2 style={{ marginTop: "40px" }}>📊 Analytics</h2>
-      <div style={{ display: "flex", gap: "40px", marginTop: "20px" }}>
-        {/* Bar Chart - URL Clicks */}
-        <div style={{ width: "400px" }}>
-          <Bar
-            data={{
-              labels: urls.map((u) => u.short_url),
-              datasets: [
-                {
-                  label: "Clicks per URL",
-                  data: urlClickCounts,
-                  backgroundColor: "#6e8efb",
-                },
-              ],
-            }}
-          />
+      {/* Line Chart Only */}
+      <h2 style={{ marginTop: "40px", color: "#00f7ff", textShadow: "0 0 15px #00f7ff" }}>
+        📈 Total Clicks Analytics
+      </h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "20px",
+        }}
+      >
+        <div
+          style={{
+            width: "600px",
+            background: "#111",
+            padding: "20px",
+            borderRadius: "10px",
+            boxShadow: "0 0 20px #00f7ff",
+          }}
+        >
+          <Line data={lineChartData} />
         </div>
-
-        {/* Pie Chart - Device Type */}
-        <div style={{ width: "300px" }}>
-          <Pie
-            data={{
-              labels: ["Desktop", "Mobile"],
-              datasets: [
-                {
-                  label: "Device Type",
-                  data: [deviceCounts.Desktop, deviceCounts.Mobile],
-                  backgroundColor: ["#36A2EB", "#FF6384"],
-                },
-              ],
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Location Bubbles */}
-      <h3 style={{ marginTop: "40px" }}>🌎 Click Locations</h3>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "15px" }}>
-        {Object.entries(locationCounts).map(([loc, count]) => (
-          <div
-            key={loc}
-            style={{
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              background: "#6e8efb",
-              color: "white",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-              textAlign: "center",
-              boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
-            }}
-          >
-            <small>{loc}</small>
-            <strong>{count}</strong>
-          </div>
-        ))}
       </div>
     </div>
   );
