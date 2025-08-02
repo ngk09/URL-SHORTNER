@@ -5,22 +5,21 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
-import Redirect from "./pages/Redirect" //  Fixed import to match file name
+import Redirect from "./pages/Redirect";
 import ErrorPage from "./pages/ErrorPage";
 
 // Layout & Components
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// ✅ Router Setup
 const router = createBrowserRouter([
   {
-    path: "/",                   // Base path
-    element: <AppLayout />,       // Main layout
-    errorElement: <ErrorPage />,  // Handles route errors or 404
+    path: "/",
+    element: <AppLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
-        index: true,              // Default child for "/"
+        index: true,
         element: <LandingPage />,
       },
       {
@@ -36,12 +35,13 @@ const router = createBrowserRouter([
         element: <Auth />,
       },
       {
-        path: ":id",               // Handles short URL redirection
+        // ✅ Short URL redirect
+        path: ":code", // changed from :id to :code to match useParams
         element: <Redirect />,
       },
       {
         path: "*",
-        element: <ErrorPage />,    // Catch-all 404
+        element: <ErrorPage />,
       },
     ],
   },
