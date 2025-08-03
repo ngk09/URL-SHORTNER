@@ -35,9 +35,9 @@ const router = createBrowserRouter([
         element: <Auth />,
       },
       {
-        // ✅ Short URL redirect to Vercel API
-        path: ":code", 
-        element: <Redirect />, 
+        // ✅ Short URL redirect
+        path: ":code", // changed from :id to :code to match useParams
+        element: <Redirect />,
       },
       {
         path: "*",
