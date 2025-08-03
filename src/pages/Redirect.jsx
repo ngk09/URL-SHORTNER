@@ -1,18 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import supabase from "../db/supabase";
 
 export default function Redirect() {
-  const { code } = useParams(); // Matches route like /:code
+  const { code } = useParams(); 
+  const clickedRef = useRef(false); // ✅ Prevent double increment
 
   useEffect(() => {
     const handleRedirect = async () => {
-      if (!code) {
-        console.log("❌ No code found in URL params");
-        return;
-      }
-
-      console.log("🔹 Starting redirect process for:", code);
+      if (!code || clickedRef.current) return; // ✅ Already incremented
+      clickedRef.current = true;
 
       try {
         // 1️⃣ Fetch original URL
@@ -30,17 +27,17 @@ export default function Redirect() {
 
         console.log("✅ URL fetched:", urlData);
 
-        // 2️⃣ Prepare REST RPC URL for increment_clicks
-        const rpcUrl = `${supabase.supabaseUrl}/rest/v1/rpc/increment_clicks?apikey=${supabase.supabaseKey}`;
-        const body = JSON.stringify({ url_id: urlData.id });
+        // 2️⃣ Increment clicks
+        const { error: updateError } = await supabase
+          .from("urls")
+          .update({ total_clicks: urlData.total_clicks + 1 })
+          .eq("id", urlData.id);
 
-        // 3️⃣ Use navigator.sendBeacon for reliable click logging
-        const blob = new Blob([body], { type: "application/json" });
-        navigator.sendBeacon(rpcUrl, blob);
+        if (updateError) console.error("❌ Click increment failed:", updateError);
+        else console.log("✅ Click incremented successfully");
 
-        // 4️⃣ Immediate redirect for the user
+        // 3️⃣ Redirect after increment
         window.location.replace(urlData.original_url);
-
       } catch (err) {
         console.error("❌ Fatal redirect error:", err);
       }

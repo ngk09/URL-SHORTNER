@@ -28,7 +28,6 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [url, setUrl] = useState("");
   const [urls, setUrls] = useState([]);
-  const [clicks, setClicks] = useState([]);
 
   const HOST_URL = window.location.origin;
 
@@ -43,23 +42,9 @@ export default function Dashboard() {
     setUrls(data || []);
   };
 
-  // Fetch Clicks
-  const fetchClicks = async () => {
-    if (!user || urls.length === 0) return;
-    const { data } = await supabase
-      .from("clicks")
-      .select("url_id")
-      .in("url_id", urls.map((u) => u.id));
-    setClicks(data || []);
-  };
-
   useEffect(() => {
     fetchUrls();
   }, [user]);
-
-  useEffect(() => {
-    fetchClicks();
-  }, [urls]);
 
   // Shorten URL
   const handleSubmit = async (e) => {
@@ -91,7 +76,6 @@ export default function Dashboard() {
     const { error } = await supabase.from("urls").delete().eq("id", id);
     if (error) console.error("Delete failed:", error);
     fetchUrls();
-    fetchClicks();
   };
 
   const downloadQR = (qr, code) => {
@@ -101,13 +85,13 @@ export default function Dashboard() {
     link.click();
   };
 
-  // Line Chart: Total Clicks per URL
+  // Line Chart: Total Clicks per URL (use total_clicks directly)
   const lineChartData = {
     labels: urls.map((u) => u.short_url),
     datasets: [
       {
         label: "Total Clicks Per URL",
-        data: urls.map((u) => clicks.filter((c) => c.url_id === u.id).length),
+        data: urls.map((u) => u.total_clicks),
         borderColor: "#00f7ff",
         backgroundColor: "rgba(0, 247, 255, 0.2)",
         fill: true,
@@ -206,7 +190,7 @@ export default function Dashboard() {
               <td>
                 <img src={item.qr} alt="QR" width="80" />
               </td>
-              <td>{clicks.filter((c) => c.url_id === item.id).length}</td>
+              <td>{item.total_clicks}</td>
               <td>
                 <button
                   onClick={() => downloadQR(item.qr, item.short_url)}
