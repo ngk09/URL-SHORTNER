@@ -30,26 +30,14 @@ export default function Redirect() {
 
         console.log("✅ URL fetched:", urlData);
 
-        // 2️⃣ Immediate redirect for the user
+        // 2️⃣ Send click increment using navigator.sendBeacon
+        const rpcUrl = `${supabase.supabaseUrl}/rest/v1/rpc/increment_clicks`;
+        const body = JSON.stringify({ url_id: urlData.id });
+
+        navigator.sendBeacon(rpcUrl, body); // Reliable even if page unloads
+
+        // 3️⃣ Immediate redirect for the user
         window.location.replace(urlData.original_url);
-
-        // 3️⃣ Increment click count with slight delay to ensure request is sent
-        setTimeout(async () => {
-          try {
-            const { data: rpcData, error: rpcError } = await supabase.rpc(
-              "increment_clicks",
-              { url_id: urlData.id }
-            );
-
-            if (rpcError) {
-              console.error("❌ Click increment failed:", rpcError.message);
-            } else {
-              console.log("✅ Click incremented successfully:", rpcData);
-            }
-          } catch (err) {
-            console.error("❌ Unexpected error updating click:", err);
-          }
-        }, 500); // 0.5 second delay to ensure browser doesn't cancel the request
 
       } catch (err) {
         console.error("❌ Fatal redirect error:", err);
