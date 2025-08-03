@@ -23,21 +23,26 @@ export default function Header() {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        boxShadow: "0 0 20px #ff758c, 0 0 40px #ff7eb3",
+        boxShadow: "0 0 20px #00f7ff, 0 0 40px #00d0ff",
         position: "sticky",
         top: 0,
         zIndex: 100,
       }}
     >
-      {/* Logo / Brand Name */}
+      {/* Logo / Brand Name with BLUE NEON */}
       <Link
         to="/"
         style={{
           fontSize: "24px",
           fontWeight: "bold",
-          color: "#fff",
+          color: "#00f7ff", // Neon blue color
           textDecoration: "none",
-          textShadow: "0 0 10px #ff758c, 0 0 20px #ff7eb3",
+          textShadow: `
+            0 0 5px #00f7ff,
+            0 0 10px #00f7ff,
+            0 0 20px #00d0ff,
+            0 0 40px #00d0ff
+          `,
         }}
       >
         VV URL SHORTNER
@@ -50,12 +55,12 @@ export default function Header() {
             to="/auth"
             style={{
               padding: "10px 20px",
-              background: "linear-gradient(90deg, #ff758c, #ff7eb3)",
+              background: "linear-gradient(90deg, #00f7ff, #00d0ff)",
               color: "#fff",
               borderRadius: "10px",
               textDecoration: "none",
               fontWeight: "bold",
-              boxShadow: "0 0 15px #ff758c, 0 0 30px #ff7eb3",
+              boxShadow: "0 0 15px #00f7ff, 0 0 30px #00d0ff",
             }}
           >
             Login
@@ -65,13 +70,13 @@ export default function Header() {
             onClick={handleLogout}
             style={{
               padding: "10px 20px",
-              background: "linear-gradient(90deg, #ff758c, #ff7eb3)",
+              background: "linear-gradient(90deg, #00f7ff, #00d0ff)",
               color: "white",
               border: "none",
               borderRadius: "10px",
               fontWeight: "bold",
               cursor: "pointer",
-              boxShadow: "0 0 15px #ff758c, 0 0 30px #ff7eb3",
+              boxShadow: "0 0 15px #00f7ff, 0 0 30px #00d0ff",
             }}
           >
             Logout
