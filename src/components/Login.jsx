@@ -55,7 +55,7 @@ export default function Login() {
             textShadow: "0 0 10px #6e8efb, 0 0 20px #a777e3",
           }}
         >
-          Neon Login
+          Login
         </h2>
 
         <form onSubmit={handleLogin}>

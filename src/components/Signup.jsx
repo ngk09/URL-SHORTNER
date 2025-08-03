@@ -54,7 +54,7 @@ export default function Signup() {
             textShadow: "0 0 10px #ff758c, 0 0 20px #ff7eb3",
           }}
         >
-          Neon Signup
+           Signup
         </h2>
 
         <input

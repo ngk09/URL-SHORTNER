@@ -40,7 +40,7 @@ export default function Header() {
           textShadow: "0 0 10px #ff758c, 0 0 20px #ff7eb3",
         }}
       >
-        VV_URL_SHORTNER
+        VV URL SHORTNER
       </Link>
 
       {/* Right Side Buttons */}
