@@ -10,7 +10,7 @@ export default function Redirect() {
       if (!code) return;
 
       try {
-        // 1️⃣ Fetch original URL
+        // 1️⃣ Fetch URL
         const { data: urlData, error: urlError } = await supabase
           .from("urls")
           .select("*")
@@ -22,42 +22,15 @@ export default function Redirect() {
           return;
         }
 
-        // 2️⃣ Log the click in background (no await for redirect to work fast)
-        (async () => {
-          try {
-            let city = "Unknown";
-            let country = "Unknown";
-
-            // Geo info (optional)
-            fetch("https://ipinfo.io/json?token=YOUR_REAL_TOKEN")
-              .then((res) => res.json())
-              .then(async (geo) => {
-                city = geo.city || "Unknown";
-                country = geo.country || "Unknown";
-
-                // Insert into clicks table
-                await supabase.from("clicks").insert([
-                  {
-                    url_id: urlData.id,
-                    device: navigator.userAgent,
-                    city,
-                    country,
-                  },
-                ]);
-
-                // Increment total_clicks atomically
-                await supabase.rpc("increment_clicks", { url_id: urlData.id });
-              });
-          } catch (err) {
-            console.warn("Analytics logging failed:", err);
-          }
-        })();
-
-        // 3️⃣ Redirect immediately
+        // 2️⃣ Redirect first (non-blocking)
         window.location.replace(urlData.original_url);
 
+        // 3️⃣ Log click in background
+        // Use a Supabase function for atomic increment
+        await supabase.rpc("increment_clicks", { url_id: urlData.id });
+
       } catch (err) {
-        console.error("Unexpected error:", err);
+        console.error("Redirect error:", err);
       }
     };
 
