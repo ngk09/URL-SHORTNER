@@ -30,13 +30,15 @@ export default function Redirect() {
 
         console.log("✅ URL fetched:", urlData);
 
-        // 2️⃣ Send click increment using navigator.sendBeacon
-        const rpcUrl = `${supabase.supabaseUrl}/rest/v1/rpc/increment_clicks`;
+        // 2️⃣ Prepare REST RPC URL for increment_clicks
+        const rpcUrl = `${supabase.supabaseUrl}/rest/v1/rpc/increment_clicks?apikey=${supabase.supabaseKey}`;
         const body = JSON.stringify({ url_id: urlData.id });
 
-        navigator.sendBeacon(rpcUrl, body); // Reliable even if page unloads
+        // 3️⃣ Use navigator.sendBeacon for reliable click logging
+        const blob = new Blob([body], { type: "application/json" });
+        navigator.sendBeacon(rpcUrl, blob);
 
-        // 3️⃣ Immediate redirect for the user
+        // 4️⃣ Immediate redirect for the user
         window.location.replace(urlData.original_url);
 
       } catch (err) {
