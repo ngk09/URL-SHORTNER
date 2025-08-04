@@ -111,7 +111,7 @@ export default function Dashboard() {
       }}
     >
       <h1 style={{ textAlign: "center", color: "#00f7ff", textShadow: "0 0 20px #00f7ff" }}>
-        ⚡ My Neon Dashboard ⚡
+        ⚡ Dashboard ⚡
       </h1>
 
       {/* Shorten Form */}
