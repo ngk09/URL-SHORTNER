@@ -1,4 +1,4 @@
-# ✨ VV URL Shortner – Smart, Fast & Powerful Link Management
+# ✨ SWIFTLINK VV URL Shortner – Smart, Fast & Powerful Link Management
 
 VV URL Shortner is a **modern Supabase-powered platform** to **shorten, track, and manage your links** effortlessly.  
 Designed with a **beautiful, responsive UI**, it ensures **every click counts**.
